@@ -12,37 +12,30 @@ in the format: Thu, 01 Jan 1970 00:00:00 GMT   */
 /*  A request to /api/1451001600000 should return 
 { unix: 1451001600000, utc: "Fri, 25 Dec 2015 00:00:00 GMT" }   */
 app.get("/api", (req, res) => {
-  res.send({
-    unix: Math.floor(new Date()),
+  res.json({
+    unix: new Date().getTime(),
     utc: new Date().toUTCString(),
   });
 });
 
 app.get("/api/:date?", (req, res) => {
   let regex = /^\d{4}-\d{2}-\d{2}$/;
-  let input = new Date(req.params.date).toString();
-  let arrayDate = input.split(" ");
+  let date = req.params.date;
+  let parsed = new Date(date).toString();
 
-  if (req.params.date.match(regex)) {
-    if (arrayDate[5] === undefined) {
-      res.send({
-        error: "Invalid Date",
-      });
-    }
-    res.send({
-      unix: Math.floor(new Date(input)),
-      utc: new Date(req.params.date).toUTCString(),
+  if (date.match(regex)) {
+    res.json({
+      unix: Math.floor(new Date(parsed)),
+      utc: new Date(date).toUTCString(),
     });
-  } else if (
-    typeof parseInt(req.params.date) == "number" &&
-    req.params.date > 0
-  ) {
-    res.send({
-      unix: parseInt(req.params.date),
-      utc: new Date(parseInt(req.params.date)).toUTCString(),
+  } else if (typeof parseInt(date) == "number" && date > 0) {
+    let unix = parseInt(date);
+    res.json({
+      unix: unix,
+      utc: new Date(unix).toUTCString(),
     });
   } else {
-    res.send({
+    res.json({
       error: "Invalid Date",
     });
   }

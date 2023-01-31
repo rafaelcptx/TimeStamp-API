@@ -11,6 +11,12 @@ in the format: Thu, 01 Jan 1970 00:00:00 GMT   */
 
 /*  A request to /api/1451001600000 should return 
 { unix: 1451001600000, utc: "Fri, 25 Dec 2015 00:00:00 GMT" }   */
+app.get("/api", (req, res) => {
+  res.send({
+    unix: Math.floor(new Date()),
+    utc: new Date().toUTCString(),
+  });
+});
 
 app.get("/api/:date?", (req, res) => {
   let regex = /^\d{4}-\d{2}-\d{2}$/;
@@ -23,10 +29,9 @@ app.get("/api/:date?", (req, res) => {
         error: "Invalid Date",
       });
     }
-
     res.send({
       unix: Math.floor(new Date(input)),
-      utc: new Date(parseInt(req.params.date)).toUTCString(),
+      utc: new Date(req.params.date).toUTCString(),
     });
   } else if (
     typeof parseInt(req.params.date) == "number" &&

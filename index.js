@@ -13,6 +13,7 @@ in the format: Thu, 01 Jan 1970 00:00:00 GMT   */
 { unix: 1451001600000, utc: "Fri, 25 Dec 2015 00:00:00 GMT" }   */
 
 app.get("/api/:date?", (req, res) => {
+  let regex = /^\d{4}-\d{2}-\d{2}$/;
   let input = new Date(req.params.date).toString();
   let arrayDate = input.split(" ");
   let day = arrayDate[0];
@@ -20,14 +21,25 @@ app.get("/api/:date?", (req, res) => {
   let date = arrayDate[2];
   let year = arrayDate[3];
   let hours = arrayDate[4];
-  let gmt = arrayDate[5].slice(0, 3);
-
   let unix = Math.floor(new Date(input));
 
-  res.send({
-    unix: unix,
-    utc: `${day}, ${date} ${month} ${year} ${hours} ${gmt}`,
-  });
+  if (typeof parseInt(req.params.date) == "number" && req.params.date > 0) {
+    res.send({
+      unix: parseInt(req.params.date),
+      utc: new Date(req.params.date / 1000),
+    });
+  } else if (req.params.date.match(regex)) {
+    let gmt = arrayDate[5].slice(0, 3);
+
+    res.send({
+      unix: unix,
+      utc: `${day}, ${date} ${month} ${year} ${hours} ${gmt}`,
+    });
+  } else {
+    res.send({
+      error: "Invalid Date",
+    });
+  }
 });
 
-app.listen(5080);
+app.listen(5090);

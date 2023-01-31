@@ -16,24 +16,25 @@ app.get("/api/:date?", (req, res) => {
   let regex = /^\d{4}-\d{2}-\d{2}$/;
   let input = new Date(req.params.date).toString();
   let arrayDate = input.split(" ");
-  let day = arrayDate[0];
-  let month = arrayDate[1];
-  let date = arrayDate[2];
-  let year = arrayDate[3];
-  let hours = arrayDate[4];
-  let unix = Math.floor(new Date(input));
 
-  if (typeof parseInt(req.params.date) == "number" && req.params.date > 0) {
+  if (req.params.date.match(regex)) {
+    if (arrayDate[5] === undefined) {
+      res.send({
+        error: "Invalid Date",
+      });
+    }
+
+    res.send({
+      unix: Math.floor(new Date(input)),
+      utc: new Date(parseInt(req.params.date)).toUTCString(),
+    });
+  } else if (
+    typeof parseInt(req.params.date) == "number" &&
+    req.params.date > 0
+  ) {
     res.send({
       unix: parseInt(req.params.date),
-      utc: new Date(req.params.date / 1000),
-    });
-  } else if (req.params.date.match(regex)) {
-    let gmt = arrayDate[5].slice(0, 3);
-
-    res.send({
-      unix: unix,
-      utc: `${day}, ${date} ${month} ${year} ${hours} ${gmt}`,
+      utc: new Date(parseInt(req.params.date)).toUTCString(),
     });
   } else {
     res.send({

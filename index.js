@@ -19,11 +19,10 @@ app.get("/api", (req, res) => {
 });
 
 app.get("/api/:date?", (req, res) => {
-  let regex = /^\d{4}-\d{2}-\d{2}$/;
   let date = req.params.date;
   let parsed = new Date(date).toString();
 
-  if (date.match(regex)) {
+  if (new Date(date) != "Invalid Date") {
     res.json({
       unix: Math.floor(new Date(parsed)),
       utc: new Date(date).toUTCString(),
